@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Cart</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* --- THEME BASE --- */
+:root { 
+  --bg: #FAFBFF; 
+  --card: #FFFFFF; 
+  --primary: #FF6B6B; 
+  --text: #2D3436; 
+  --subtext: #Aeb3b9;
+  --shadow: 0 5px 20px rgba(0,0,0,0.05);
+  --tint: transparent;
+  --pattern: none;
+  --qty-bg: rgba(0,0,0,0.05); 
+}
+
+body.dark-mode { 
+  --bg: #121212; --card: #1E1E1E; --text: #F1F2F6; --subtext: #A4B0BE; --shadow: 0 5px 20px rgba(0,0,0,0.5);
+  --qty-bg: rgba(255,255,255,0.1); 
+}
+
+/* --- DYNAMIC MODE THEMES --- */
+body.mode-mate { 
+  --primary: #00a8ff; 
+  --bg: linear-gradient(180deg, #f1f4ff 0%, #FAFBFF 100%);
+  --tint: rgba(0, 168, 255, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300a8ff' fill-opacity='0.08'%3E%3Cpath d='M50 50l-10 20h20zM50 55l3 5h-6z' /%3E%3Cpath d='M20 20c0-6 4-10 10-10s10 4 10 10v5H20v-5zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3Ccircle cx='60' cy='20' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.mode-couple { 
+  --primary: #ef5777; 
+  --bg: linear-gradient(180deg, #fff0f3 0%, #FAFBFF 100%);
+  --tint: rgba(239, 87, 119, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef5777' fill-opacity='0.08'%3E%3Cpath d='M30 10c-3-4-8-4-11 0-3 4-3 9 0 13l11 11 11-11c3-4 3-9 0-13-3-4-8-4-11 0z' /%3E%3Cpath d='M10 40h10v10H10z' transform='rotate(45 15 45)' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.mode-single { 
+  --primary: #0be881; 
+  --bg: linear-gradient(180deg, #e8fcf0 0%, #FAFBFF 100%);
+  --tint: rgba(11, 232, 129, 0.04);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230be881' fill-opacity='0.08'%3E%3Cpath d='M30 30c-10 0-20-10-20-20 0 10 10 20 20 20s20-10 20-20c0 10-10 20-20 20z' /%3E%3Ccircle cx='10' cy='50' r='3'/%3E%3Ccircle cx='18' cy='45' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; outline: none; }
+
+body { 
+  background-color: var(--bg); 
+  background-image: var(--pattern), var(--bg);
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed;
+  color: var(--text); 
+  padding-bottom: 50px; 
+  transition: 0.3s; 
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+body.dark-mode .header { background: rgba(30,30,30,0.85); }
+
+h1 { font-size: 20px; color: var(--text); font-weight: 700; }
+button { cursor: pointer; border: none; transition: 0.3s; }
+.btn-back { background: transparent; color: var(--text); font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+
+/* LAYOUT */
+.container {
+  max-width: 1000px; margin: 20px auto; padding: 0 20px;
+  display: grid; grid-template-columns: 1fr 340px; gap: 30px;
+}
+
+/* CART ITEMS */
+.cart-list { display: flex; flex-direction: column; gap: 15px; }
+
+.cart-item {
+  background: var(--card); border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 15px;
+  box-shadow: var(--shadow); animation: slideIn 0.4s ease; border: 1px solid transparent; position: relative;
+  transition: transform 0.2s, opacity 0.3s;
+  background-image: linear-gradient(to bottom right, var(--card), var(--tint));
+}
+@keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+
+.item-img { width: 70px; height: 70px; border-radius: 15px; object-fit: cover; background: #eee; }
+.item-info { flex: 1; }
+.item-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--text); }
+.item-price { color: var(--primary); font-size: 14px; font-weight: 700; }
+.chip { font-size: 10px; padding: 3px 8px; border-radius: 8px; background: var(--bg); color: var(--subtext); vertical-align: middle; border: 1px solid rgba(0,0,0,0.05); margin-left: 5px; }
+
+/* QTY CONTROLS */
+.qty-box {
+  display: flex; align-items: center; gap: 10px; 
+  background: var(--qty-bg);
+  padding: 5px 10px; border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.qty-btn { width: 25px; height: 25px; border-radius: 50%; background: var(--card); color: var(--text); font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.qty-btn:hover { background: var(--primary); color: #fff; }
+
+/* SUMMARY & PROMO */
+.summary-card {
+  background: var(--card); padding: 25px; border-radius: 25px;
+  box-shadow: var(--shadow); height: fit-content;
+  position: sticky; top: 80px;
+  background-image: linear-gradient(to bottom right, var(--card), var(--tint));
+}
+.summary-card h3 { margin-bottom: 20px; color: var(--text); }
+
+.promo-box { display: flex; gap: 10px; margin-bottom: 20px; }
+.promo-input { 
+  width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); 
+  background: var(--bg); color: var(--text); font-size: 13px;
+}
+.apply-btn { 
+  background: var(--primary); color: white; padding: 0 15px; 
+  border-radius: 12px; font-weight: 600; font-size: 12px; 
+  border: none; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+  transition: 0.2s;
+}
+
+.row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: var(--subtext); font-weight: 500; }
+.row span:last-child { color: var(--text); font-weight: 600; }
+.total-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px dashed rgba(0,0,0,0.1); font-weight: 700; font-size: 20px; color: var(--primary); }
+
+.checkout-btn {
+  width: 100%; padding: 15px; background: var(--primary); color: white;
+  border-radius: 15px; font-weight: 600; font-size: 16px; margin-top: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  grid-column: 1 / -1; text-align: center; padding: 50px 20px; display: none;
+}
+.empty-icon { font-size: 60px; margin-bottom: 10px; display: block; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-10px)} 100%{transform:translateY(0)} }
+
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+  background: #2D3436; color: #fff; padding: 12px 30px; border-radius: 50px;
+  font-size: 14px; font-weight: 600; opacity: 0; transition: 0.5s; pointer-events: none; z-index: 2000;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast">Action Successful</div>
+
+<div class="header">
+  <button class="btn-back" onclick="window.location.href='index1.html'">⬅ Continue Shopping</button>
+  <button class="btn-back" onclick="clearCart()" style="color:var(--primary); font-size:12px">🗑 Clear</button>
+</div>
+
+<div class="container">
+  <div class="cart-list" id="cartList"></div>
+  
+  <div class="summary-card" id="summaryCard">
+    <h3>Bill Details</h3>
+    
+    <div class="promo-box">
+      <input type="text" id="promoCode" class="promo-input" placeholder="Promo Code (Try 'TASTY')">
+      <button class="apply-btn" onclick="applyPromo()">Apply</button>
+    </div>
+
+    <div class="row"><span>Item Total</span> <span id="subtotal">₹0</span></div>
+    <div class="row"><span>Taxes (5%)</span> <span id="tax">₹0</span></div>
+    <div class="row"><span>Discount</span> <span id="discount" style="color:#2ecc71">₹0</span></div>
+    
+    <div class="row" style="align-items:center">
+      <span>Tip the Chef 👨‍🍳</span> 
+      <span id="tipVal" style="color:var(--primary)">₹0</span>
+    </div>
+    <input type="range" min="0" max="100" step="10" value="0" style="width:100%; margin-bottom:15px; accent-color:var(--primary)" oninput="updateTip(this.value)">
+
+    <div class="total-row"><span>To Pay</span> <span id="total">₹0</span></div>
+    <button class="checkout-btn" onclick="placeOrder()">Place Order 💳</button>
+  </div>
+  
+  <div class="empty-state" id="emptyState">
+    <span class="empty-icon">🍳</span>
+    <h2>Kitchen is quiet...</h2>
+    <p style="color:var(--subtext)">Add some delicious meals to start cooking!</p>
+    <a href="index1.html" style="background:var(--primary); color:white; padding:12px 25px; border-radius:25px; display:inline-block; text-decoration:none; margin-top:15px;">Browse Menu</a>
+  </div>
+</div>
+
+<script>
+if(sessionStorage.getItem("loggedIn") !== "yes") window.location.href="login.html";
+if(localStorage.getItem("darkMode") === "yes") document.body.classList.add("dark-mode");
+
+const mode = localStorage.getItem("appMode") || "single";
+document.body.classList.add("mode-" + mode);
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let currentTip = 0;
+let discountAmt = 0;
+let totalAmt = 0;
+
+function renderCart() {
+  const list = document.getElementById("cartList");
+  const empty = document.getElementById("emptyState");
+  const summary = document.getElementById("summaryCard");
+  list.innerHTML = "";
+
+  if (cart.length === 0) {
+    empty.style.display = "block";
+    summary.style.display = "none";
+    list.style.display = "none";
+    return;
+  }
+
+  empty.style.display = "none";
+  summary.style.display = "block";
+  list.style.display = "flex";
+
+  let subtotal = 0;
+  cart.forEach((item, i) => {
+    const price = item.type === 'meal' ? 250 : 40;
+    subtotal += (price * item.qty);
+    list.innerHTML += `
+      <div class="cart-item" id="item-${i}">
+        <img src="${item.img || 'https://www.themealdb.com/images/ingredients/Lime.png'}" class="item-img">
+        <div class="item-info">
+          <div class="item-name">${item.name} <span class="chip">${item.type === 'meal' ? 'Meal' : 'Ingr.'}</span></div>
+          <div class="item-price">₹${price}</div>
+        </div>
+        <div class="qty-box">
+          <button class="qty-btn" onclick="updateQty(${i}, -1)">−</button>
+          <span style="font-weight:700; width:25px; text-align:center;">${item.qty}</span>
+          <button class="qty-btn" onclick="updateQty(${i}, 1)">+</button>
+        </div>
+      </div>`;
+  });
+
+  const tax = Math.round(subtotal * 0.05);
+  totalAmt = subtotal + tax + parseInt(currentTip) - discountAmt;
+  if(totalAmt < 0) totalAmt = 0;
+
+  document.getElementById("subtotal").innerText = "₹" + subtotal;
+  document.getElementById("tax").innerText = "₹" + tax;
+  document.getElementById("total").innerText = "₹" + totalAmt;
+  document.getElementById("discount").innerText = "-₹" + discountAmt;
+  document.getElementById("tipVal").innerText = "₹" + currentTip;
+}
+
+function updateQty(index, change) {
+  cart[index].qty += change;
+  if (cart[index].qty <= 0) {
+    cart.splice(index, 1);
+    showToast("Item removed 🗑️");
+  }
+  saveAndRender();
+}
+
+function saveAndRender(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
+function clearCart() {
+  if(confirm("Empty your cart?")){
+    cart = [];
+    saveAndRender();
+  }
+}
+
+function updateTip(val){
+  currentTip = val;
+  renderCart();
+}
+
+function applyPromo(){
+  const code = document.getElementById("promoCode").value.toUpperCase();
+  if(code === "TASTY" || code === "SAVE10"){
+    discountAmt = 50; 
+    showToast("Promo Applied! 🎉");
+  } else {
+    showToast("Invalid Code ❌");
+    discountAmt = 0;
+  }
+  renderCart();
+}
+
+async function placeOrder() {
+  const orderPayload = {
+    id: Math.floor(1000 + Math.random() * 9000),
+    date: new Date().toLocaleDateString(),
+    items: cart,
+    total: totalAmt
+  };
+
+  try {
+    // 1. Send to Backend
+    const response = await fetch('http://localhost:5000/api/place-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload)
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      // 2. Save to Local History
+      let history = JSON.parse(localStorage.getItem("orderHistory")) || [];
+      history.push(orderPayload);
+      localStorage.setItem("orderHistory", JSON.stringify(history));
+
+      // 3. Clear Cart & Move to Invoice
+      localStorage.setItem("lastOrder", JSON.stringify(cart));
+      localStorage.removeItem("cart");
+      window.location.href = "invoice.html";
+    }
+  } catch (error) {
+    console.error("Connection Error:", error);
+    showToast("Server is offline. Start app.py!");
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast"); 
+  t.innerText = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+renderCart();
+</script>
+</body>
+</html>

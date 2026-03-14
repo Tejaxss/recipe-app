@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome - Recipe Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- THEME ENGINE --- */
+:root { 
+  --bg: #FAFBFF; --card: #FFFFFF; --primary: #FF6B6B; --text: #2D3436; 
+  --pattern: none; --tint: transparent;
+}
+
+/* 1. MATE MODE */
+body.mode-mate { 
+  --primary: #00a8ff; 
+  --bg: linear-gradient(180deg, #f0fbff 0%, #FAFBFF 100%);
+  --tint: rgba(0, 168, 255, 0.05);
+  --pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300a8ff' fill-opacity='0.08'%3E%3Cpath d='M50 50l-10 20h20zM50 55l3 5h-6z' /%3E%3Cpath d='M20 20c0-6 4-10 10-10s10 4 10 10v5H20v-5zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3Ccircle cx='60' cy='20' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 2. COUPLE MODE */
+body.mode-couple { 
+  --primary: #ef5777; 
+  --bg: linear-gradient(180deg, #fff0f3 0%, #FAFBFF 100%);
+  --tint: rgba(239, 87, 119, 0.05);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef5777' fill-opacity='0.08'%3E%3Cpath d='M30 10c-3-4-8-4-11 0-3 4-3 9 0 13l11 11 11-11c3-4 3-9 0-13-3-4-8-4-11 0z' /%3E%3Cpath d='M10 40h10v10H10z' transform='rotate(45 15 45)' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 3. SINGLE MODE */
+body.mode-single { 
+  --primary: #0be881; 
+  --bg: linear-gradient(180deg, #e8fcf0 0%, #FAFBFF 100%);
+  --tint: rgba(11, 232, 129, 0.05);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230be881' fill-opacity='0.08'%3E%3Cpath d='M30 30c-10 0-20-10-20-20 0 10 10 20 20 20s20-10 20-20c0 10-10 20-20 20z' /%3E%3Ccircle cx='10' cy='50' r='3'/%3E%3Ccircle cx='18' cy='45' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; outline: none; }
+
+body {
+  height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background-color: var(--bg);
+  background-image: var(--pattern), var(--bg);
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed;
+  color: var(--text); overflow: hidden;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* --- VIEW 1: MODE SELECTION --- */
+#modeSelection {
+  text-align: center; width: 100%; max-width: 400px; padding: 20px;
+  animation: fadeIn 0.8s ease;
+}
+
+.big-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; color: #333; }
+.sub-title { font-size: 14px; color: #666; margin-bottom: 40px; }
+
+.mode-card-container { display: flex; flex-direction: column; gap: 15px; }
+
+.mode-card {
+  background: white; border-radius: 20px; padding: 20px;
+  display: flex; align-items: center; gap: 20px; cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 2px solid transparent;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.mode-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+
+.mode-icon { font-size: 30px; width: 60px; height: 60px; background: #f8f9fa; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+.mode-text h3 { font-size: 18px; margin-bottom: 2px; }
+.mode-text p { font-size: 12px; color: #888; }
+
+.mode-mate:hover { border-color: #00a8ff; }
+.mode-mate:hover .mode-icon { background: #e1f5fe; transform: scale(1.1) rotate(-10deg); }
+.mode-couple:hover { border-color: #ef5777; }
+.mode-couple:hover .mode-icon { background: #fce4ec; transform: scale(1.1) rotate(10deg); }
+.mode-single:hover { border-color: #0be881; }
+.mode-single:hover .mode-icon { background: #e8f5e9; transform: scale(1.1); }
+
+/* --- VIEW 3: SURPRISE TASKS --- */
+#taskOverlay {
+  display: none; width: 100%; height: 100%; position: absolute; top:0; left:0;
+  justify-content: center; align-items: center; flex-direction: column;
+  z-index: 20; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+  animation: fadeIn 0.5s ease;
+}
+.task-instruction { font-size: 20px; font-weight: 700; margin-bottom: 30px; color: var(--text); }
+
+/* MATE GAME: SMASH PINATA */
+.pinata-target {
+  font-size: 80px; cursor: pointer; transition: 0.1s; user-select: none;
+}
+.pinata-target:active { transform: scale(0.9) rotate(5deg); }
+.hit-anim { animation: shakePinata 0.2s ease-in-out; }
+@keyframes shakePinata { 0%{transform:rotate(0)} 25%{transform:rotate(15deg)} 75%{transform:rotate(-15deg)} 100%{transform:rotate(0)} }
+
+/* COUPLE GAME: Kiss Catch */
+.kiss-target { 
+  font-size: 60px; position: absolute; cursor: pointer; 
+  animation: floatAround 2.5s infinite ease-in-out; 
+}
+@keyframes floatAround { 
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(60px, -60px) rotate(10deg); }
+  50% { transform: translate(-60px, 60px) rotate(-10deg); }
+  75% { transform: translate(-40px, -40px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* SINGLE GAME: Slide */
+.slider-container { width: 80%; max-width: 300px; position: relative; height: 60px; background: #eee; border-radius: 30px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
+.slider-text { position: absolute; width: 100%; text-align: center; top: 20px; font-size: 14px; color: #888; font-weight: 600; pointer-events: none; z-index: 1; }
+.slide-input { 
+  -webkit-appearance: none; width: 100%; height: 100%; background: transparent; outline: none; margin: 0; 
+  position: relative; z-index: 2; cursor: pointer; 
+}
+.slide-input::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 60px; height: 60px; border-radius: 50%; 
+  background: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; 
+  transition: transform 0.2s;
+}
+.slide-input::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+/* --- VIEW 2: LOGIN CARD --- */
+.card-wrapper {
+  display: none; position: relative; width: 90%; max-width: 380px; perspective: 1000px; z-index: 10;
+  animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  text-align: center; border: 1px solid rgba(255,255,255,0.6);
+  transition: transform 0.6s; transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+}
+
+.card-wrapper.flip .card { transform: rotateY(180deg); }
+
+.face { 
+  width: 100%; 
+  -webkit-backface-visibility: hidden; backface-visibility: hidden; 
+  padding: 35px 30px; 
+  border-radius: 30px;
+}
+
+.face-front { position: relative; z-index: 2; }
+
+.face-back { 
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+  transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; 
+}
+
+h2 { color: var(--text); margin-bottom: 5px; font-weight: 700; font-size: 24px; }
+.theme-greet { color: var(--primary); font-size: 13px; font-weight: 600; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
+
+.input-group { position: relative; margin-bottom: 15px; text-align: left; }
+input {
+  width: 100%; padding: 15px 15px 15px 45px;
+  border: 2px solid transparent; border-radius: 15px;
+  font-size: 14px; transition: 0.3s;
+  background: var(--bg); color: var(--text);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+}
+input:focus { border-color: var(--primary); background: #fff; transform: scale(1.02); }
+.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+
+.btn-main {
+  width: 100%; padding: 15px; background: var(--primary); color: #fff;
+  border: none; border-radius: 15px; font-size: 16px; font-weight: 600;
+  cursor: pointer; transition: 0.3s; margin-top: 10px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(0,0,0,0.15); }
+.btn-main:active { transform: scale(0.98); }
+
+.back-btn { background: transparent; border: none; color: #888; font-size: 12px; margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-left: auto; margin-right: auto; }
+.back-btn:hover { color: var(--primary); }
+
+.switch-link { margin-top: 25px; font-size: 12px; color: #666; cursor: pointer; }
+.switch-link b { color: var(--primary); }
+
+.shake { animation: shake 0.4s ease-in-out; border-color: #ff4757 !important; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{opacity:0; transform:translateY(50px)} to{opacity:1; transform:translateY(0)} }
+@keyframes popUp { from{opacity:0; transform:scale(0)} to{opacity:1; transform:scale(1)} }
+
+/* Confetti */
+.confetti { position: fixed; width: 10px; height: 10px; animation: fall 3s linear forwards; z-index: 100; pointer-events: none; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+</style>
+</head>
+<body>
+
+<div id="modeSelection">
+  <div class="big-title">Welcome Chef! 👨‍🍳</div>
+  <div class="sub-title">Who are we cooking for today?</div>
+
+  <div class="mode-card-container">
+    <div class="mode-card mode-mate" onclick="selectMode('mate')">
+      <div class="mode-icon">🎉</div>
+      <div class="mode-text"><h3>Mate Mode</h3><p>Fun, Party Food</p></div>
+    </div>
+    <div class="mode-card mode-couple" onclick="selectMode('couple')">
+      <div class="mode-icon">❤️</div>
+      <div class="mode-text"><h3>Couple Mode</h3><p>Romantic, Date Night</p></div>
+    </div>
+    <div class="mode-card mode-single" onclick="selectMode('single')">
+      <div class="mode-icon">🌿</div>
+      <div class="mode-text"><h3>Single Mode</h3><p>Quick, Healthy Focus</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="card-wrapper" id="loginCard">
+  <button class="back-btn" onclick="goBackToModes()">← Change Mode</button>
+  <div class="card">
+    
+    <div class="face face-front">
+      <div style="font-size: 40px; margin-bottom: 5px;">🍲</div>
+      <h2 id="loginTitle">Welcome Back</h2>
+      <div class="theme-greet" id="themeGreet">Let's get cooking!</div>
+      <div class="input-group"><span class="input-icon">👤</span><input id="username" type="text" placeholder="Username"></div>
+      <div class="input-group"><span class="input-icon">🔒</span><input id="password" type="password" placeholder="Password"></div>
+      <button class="btn-main" id="loginBtn" onclick="login()">Log In</button>
+      <div class="switch-link" onclick="flipCard()">New Chef? <b>Create Account</b></div>
+    </div>
+    
+    <div class="face face-back">
+      <div style="font-size: 40px; margin-bottom: 10px;">📝</div>
+      <h2>Join Kitchen</h2>
+      <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Start your culinary journey.</p>
+      <div class="input-group"><span class="input-icon">👤</span><input id="newName" type="text" placeholder="Full Name"></div>
+      <div class="input-group"><span class="input-icon">✉️</span><input id="newEmail" type="email" placeholder="Email Address"></div>
+      <div class="input-group"><span class="input-icon">🔒</span><input id="newPass" type="password" placeholder="Create Password"></div>
+      <button class="btn-main" onclick="signup()">Sign Up</button>
+      <div class="switch-link" onclick="flipCard()">Already have an account? <b>Log In</b></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="taskOverlay"></div>
+
+<script>
+if(sessionStorage.getItem("loggedIn") === "yes") window.location.href="index1.html";
+
+let currentMode = 'single';
+let pendingUserName = "";
+let pinataHits = 0;
+
+// Initialize our "Database" in localStorage if it doesn't exist
+if (!localStorage.getItem("appUsers")) {
+    localStorage.setItem("appUsers", JSON.stringify([]));
+}
+
+function selectMode(mode) {
+  currentMode = mode;
+  localStorage.setItem("appMode", mode);
+  
+  document.body.className = "";
+  document.body.classList.add("mode-" + mode);
+  
+  document.getElementById("modeSelection").style.display = "none";
+  document.getElementById("loginCard").style.display = "block";
+  
+  const greet = document.getElementById("themeGreet");
+  const title = document.getElementById("loginTitle");
+  
+  if(mode === 'mate') {
+    title.innerText = "Squad Kitchen";
+    greet.innerText = "Log in to feed the crew";
+  } else if (mode === 'couple') {
+    title.innerText = "Hello Lovebirds";
+    greet.innerText = "Log in for date night";
+  } else {
+    title.innerText = "Chef's Table";
+    greet.innerText = "Log in for healthy focus";
+  }
+}
+
+function goBackToModes() {
+  document.body.className = "";
+  document.getElementById("modeSelection").style.display = "block";
+  document.getElementById("loginCard").style.display = "none";
+  document.getElementById("loginCard").classList.remove("flip");
+}
+
+function flipCard() { document.getElementById("loginCard").classList.toggle("flip"); }
+
+function login() {
+  const userEl = document.getElementById("username");
+  const passEl = document.getElementById("password");
+  const user = userEl.value.trim();
+  const pass = passEl.value.trim();
+  
+  if (!user || !pass) {
+    if(!user) userEl.classList.add("shake");
+    if(!pass) passEl.classList.add("shake");
+    setTimeout(() => { userEl.classList.remove("shake"); passEl.classList.remove("shake"); }, 400);
+    return;
+  }
+
+  // Fetch users from our local "database" (created via Sign Up)
+  const users = JSON.parse(localStorage.getItem("appUsers")) || [];
+  
+  // Find matching user strictly from user entry
+  const foundUser = users.find(u => u.username.toLowerCase() === user.toLowerCase() && u.password === pass);
+
+  if (foundUser) {
+      sessionStorage.setItem("role", "user");
+      pendingUserName = foundUser.fullName;
+      startGame();
+  } else {
+      alert("Invalid username or password! Please check your credentials or create an account.");
+      userEl.classList.add("shake");
+      passEl.classList.add("shake");
+      setTimeout(() => { userEl.classList.remove("shake"); passEl.classList.remove("shake"); }, 400);
+  }
+}
+
+function signup() {
+  const nameEl = document.getElementById("newName");
+  const emailEl = document.getElementById("newEmail");
+  const passEl = document.getElementById("newPass");
+  
+  const name = nameEl.value.trim();
+  const email = emailEl.value.trim();
+  const pass = passEl.value.trim();
+  
+  // Basic email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Requires minimum 8 characters, at least 1 letter and 1 number, ALLOWS special characters
+  const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+  let isValid = true;
+  let errorMsg = "";
+
+  if(!name) { 
+      nameEl.classList.add("shake"); 
+      isValid = false; 
+  }
+  if(!emailRegex.test(email)) { 
+      emailEl.classList.add("shake"); 
+      errorMsg += "• Please enter a valid email address.\n";
+      isValid = false; 
+  }
+  if(!passRegex.test(pass)) {
+      passEl.classList.add("shake");
+      errorMsg += "• Password needs 8+ characters, including at least one letter and one number.\n";
+      isValid = false;
+  }
+
+  setTimeout(() => {
+      nameEl.classList.remove("shake"); 
+      emailEl.classList.remove("shake");
+      passEl.classList.remove("shake");
+  }, 400);
+
+  if (!isValid) {
+      if (errorMsg) alert("Oops! A couple of things to fix:\n\n" + errorMsg);
+      return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("appUsers")) || [];
+  
+  if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+      alert("An account with this email already exists! Try logging in.");
+      return;
+  }
+
+  const newUser = {
+      fullName: name,
+      username: name.split(" ")[0], // Uses the first name as the login username
+      email: email,
+      password: pass 
+  };
+  
+  users.push(newUser);
+  localStorage.setItem("appUsers", JSON.stringify(users));
+  
+  alert("Account created successfully! Remember, your login username is: " + newUser.username);
+
+  sessionStorage.setItem("role", "user");
+  pendingUserName = name;
+  startGame();
+}
+
+function startGame() {
+  document.getElementById("loginCard").style.display = "none";
+  const taskDiv = document.getElementById("taskOverlay");
+  taskDiv.style.display = "flex";
+  
+  if(currentMode === 'mate') {
+    pinataHits = 0;
+    taskDiv.innerHTML = `
+      <div class="task-instruction">Smash the Piñata! 🪅</div>
+      <div class="pinata-target" onclick="hitPinata(this)">🪅</div>
+      <p style="color:#888; font-size:12px; margin-top:20px">(Tap 5 times!)</p>
+    `;
+  } else if(currentMode === 'couple') {
+    taskDiv.innerHTML = `
+      <div class="task-instruction">Catch the Love! 💋</div>
+      <div class="kiss-target" onclick="completeCoupleTask(this)">💋</div>
+    `;
+  } else {
+    taskDiv.innerHTML = `
+      <div class="task-instruction">Slide to Enter 🧘</div>
+      <div class="slider-container">
+        <div class="slider-text">Slide >>>></div>
+        <input type="range" min="0" max="100" value="0" class="slide-input" oninput="checkSlide(this)">
+      </div>
+    `;
+  }
+}
+
+// --- MATE GAME: SMASH PINATA ---
+function hitPinata(el) {
+  pinataHits++;
+  
+  el.classList.remove("hit-anim");
+  void el.offsetWidth; 
+  el.classList.add("hit-anim");
+  
+  let scale = 1 + (pinataHits * 0.2);
+  el.style.transform = `scale(${scale})`;
+
+  if(pinataHits >= 5) {
+    el.style.display = "none";
+    dropConfetti();
+    setTimeout(finalizeLogin, 1500);
+  }
+}
+
+// --- COUPLE GAME ---
+function completeCoupleTask(el) {
+  el.style.animation = "none";
+  el.style.transform = "scale(1.5)";
+  el.innerText = "❤️";
+  dropConfetti();
+  setTimeout(finalizeLogin, 1500);
+}
+
+// --- SINGLE GAME ---
+function checkSlide(el) {
+  if(el.value > 90) {
+    el.disabled = true;
+    finalizeLogin();
+  }
+}
+
+function finalizeLogin() {
+  localStorage.setItem("user", JSON.stringify({ name: pendingUserName }));
+  sessionStorage.setItem("loggedIn", "yes");
+  window.location.href = "index1.html";
+}
+
+function dropConfetti() {
+  const colors = ['#FF6B6B','#2ecc71','#f1c40f','#3498db'];
+  for(let i=0; i<40; i++){
+    let c=document.createElement("div"); c.className="confetti";
+    c.style.left=Math.random()*100+"vw"; 
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.top = -Math.random()*20+"vh"; 
+    c.style.width = Math.random()*10+5+"px";
+    c.style.height = Math.random()*10+5+"px";
+    c.style.animationDuration = (Math.random() * 2 + 1.5) + "s"; 
+    document.body.appendChild(c);
+    
+    setTimeout(() => { c.remove(); }, 3000);
+  }
+}
+
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter" && document.getElementById("loginCard").style.display === "block") login();
+});
+</script>
+
+</body>
+</html>

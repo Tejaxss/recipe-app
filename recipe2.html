@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Details</title>
+<link rel="preconnect" href="https://www.themealdb.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- THEME --- */
+:root { --bg: #FAFBFF; --card: #FFFFFF; --primary: #FF6B6B; --shadow: 0 5px 20px rgba(0,0,0,0.05); --text: #2D3436; }
+body.dark-mode { --bg: #121212; --card: #1E1E1E; --primary: #FF4757; --text: #F1F2F6; --shadow: 0 5px 20px rgba(0,0,0,0.5); }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; outline: none; }
+body { background: var(--bg); color: var(--text); padding-bottom: 90px; transition: 0.3s; }
+
+.hero { position: relative; height: 350px; background: #eee; }
+.hero img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 0.5s; }
+.hero img.loaded { opacity: 1; }
+
+.top-actions { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; }
+.icon-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #333; }
+.cart-header-btn { padding: 0 15px; border-radius: 20px; gap: 8px; font-weight: 600; width: auto; font-size: 13px; }
+
+.content { position: relative; margin-top: -40px; background: var(--bg); border-radius: 30px 30px 0 0; padding: 30px 20px; min-height: 500px; z-index: 5; transition: 0.3s; }
+.title { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+.subtitle { font-size: 14px; color: #888; margin-bottom: 20px; }
+
+/* Health Meter Styles */
+.health-meter { background: var(--card); padding: 15px; border-radius: 20px; margin-top: 10px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 15px; border: 1px solid rgba(0,0,0,0.02); }
+.gauge-bg { width: 50px; height: 50px; border-radius: 50%; border: 4px solid #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #2ecc71; }
+
+.section-head { font-size: 18px; font-weight: 700; margin: 30px 0 15px 0; display: flex; justify-content: space-between; align-items: center; }
+
+.ing-list { display: grid; gap: 12px; }
+.ing-item { background: var(--card); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); position: relative; }
+.ing-item:active { transform: scale(0.98); }
+.ing-img { width: 40px; height: 40px; object-fit: contain; }
+.ing-info b { display: block; font-size: 12px; color: var(--primary); }
+.add-one { margin-left: auto; color: var(--primary); font-weight: bold; background: #FFF0F0; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+/* COUPLE GAME BUTTON (Hidden by default) */
+#coupleGameBtn { 
+  display: none; width: 100%; padding: 15px; 
+  background: linear-gradient(135deg, #e84393, #fd79a8); 
+  color: white; font-weight: 700; border: none; border-radius: 15px; 
+  margin-bottom: 20px; cursor: pointer; 
+  align-items: center; justify-content: center; gap: 10px; 
+  box-shadow: 0 8px 20px rgba(232, 67, 147, 0.3);
+  animation: pulseHeart 2s infinite;
+}
+@keyframes pulseHeart { 0%{transform:scale(1);} 50%{transform:scale(1.02);} 100%{transform:scale(1);} }
+
+.step-list { display: flex; flex-direction: column; gap: 15px; }
+.step-item { display: flex; gap: 15px; padding: 15px; background: var(--card); border-radius: 15px; cursor: pointer; box-shadow: var(--shadow); transition: 0.3s; }
+.step-item.done { opacity: 0.4; transform: scale(0.98); background: #f0f0f0; }
+.step-num { min-width: 25px; height: 25px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; }
+
+/* SIMILAR RECIPES */
+.similar-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+.sim-card { min-width: 140px; border-radius: 15px; background: var(--card); padding: 10px; box-shadow: var(--shadow); cursor: pointer; }
+.sim-img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+.sim-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+.btn-cook { background: var(--primary); color: white; padding: 12px 30px; border-radius: 15px; font-weight: 600; border: none; cursor: pointer; }
+
+/* --- GAME MODAL --- */
+#gameModal { 
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; 
+  display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+}
+.game-card { background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px; text-align: center; position:relative; }
+.game-title { font-size: 22px; font-weight: 800; color: #e84393; margin-bottom: 5px; }
+.game-sub { font-size: 12px; color: #888; margin-bottom: 20px; }
+
+.task-row { 
+  display: flex; justify-content: space-between; align-items: center; 
+  background: #f8f9fa; padding: 12px 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee;
+}
+.task-label { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.task-result { 
+  font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 10px; 
+  min-width: 80px; text-align: center; cursor: pointer; transition: 0.2s;
+  background: #2D3436; color: white;
+}
+.winner-you { background: #6c5ce7; }
+.winner-partner { background: #e84393; }
+
+/* Confetti */
+.confetti { position: fixed; width: 10px; height: 10px; animation: fall 3s linear infinite; z-index: 4000; pointer-events: none; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+/* Voice Pulse Animation */
+@keyframes listening { 0% { box-shadow: 0 0 0 0px rgba(255, 107, 107, 0.4); } 100% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); } }
+.listening { animation: listening 1s infinite; border: 2px solid var(--primary) !important; }
+
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #2ED573; color: #fff; padding: 12px 30px; border-radius: 50px; font-size: 14px; font-weight: 600; opacity: 0; transition: 0.5s; z-index: 2000; box-shadow: 0 10px 30px rgba(46, 213, 115, 0.3); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.fly-img { position: fixed; width: 40px; height: 40px; border-radius: 50%; object-fit: contain; z-index: 9999; pointer-events: none; transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1); }
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast">✅ Added to Cart!</div>
+
+<div id="gameModal" onclick="closeGame(event)">
+  <div class="game-card" onclick="event.stopPropagation()">
+    <div class="game-title">Love & War ⚔️</div>
+    <div class="game-sub">Tap "SPIN" to assign tasks!</div>
+    
+    <div class="task-list">
+      <div class="task-row">
+        <div class="task-label">🔪 Prep & Chop</div>
+        <div class="task-result" onclick="spinTask(this)">SPIN 🎰</div>
+      </div>
+      <div class="task-row">
+        <div class="task-label">🍳 Stove Duty</div>
+        <div class="task-result" onclick="spinTask(this)">SPIN 🎰</div>
+      </div>
+      <div class="task-row">
+        <div class="task-label">🍷 Drinks & Vibes</div>
+        <div class="task-result" onclick="spinTask(this)">SPIN 🎰</div>
+      </div>
+      <div class="task-row">
+        <div class="task-label">🧼 The Dishes</div>
+        <div class="task-result" onclick="spinTask(this, true)">SPIN 🎰</div>
+      </div>
+    </div>
+
+    <button onclick="closeGameDirect()" style="margin-top:20px; width:100%; padding:12px; background:#eee; border:none; border-radius:12px; font-weight:600; cursor:pointer">Done</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="top-actions">
+    <button class="icon-btn" onclick="goBack()">⬅</button>
+    <button class="icon-btn cart-header-btn" id="viewCartBtn" onclick="stopVoice(); location.href='cart.html'">🛒 Cart <span id="cartBadge">0</span></button>
+  </div>
+  <img id="r-img" src="">
+</div>
+
+<div class="content">
+  <div id="real-content">
+    <h1 class="title" id="r-title">...</h1>
+    <p class="subtitle" id="r-cat">...</p>
+
+    <div class="health-meter">
+        <div class="gauge-bg" id="healthScore">A</div>
+        <div>
+            <div style="font-weight:700; font-size:14px;">Nutrition Breakdown</div>
+            <div style="font-size:12px; color:#888" id="healthDesc">Loading nutritional data...</div>
+        </div>
+    </div>
+
+    <div class="section-head">
+        <span>Ingredients <small style="font-size:12px;color:#888;font-weight:400">Tap +</small></span>
+        <button class="icon-btn" onclick="toggleVoice()" id="speakBtn">🔊</button>
+    </div>
+    
+    <div class="ing-list" id="r-ingredients"></div>
+
+    <div class="section-head">
+        <span>Instructions</span>
+        <span style="font-size:11px; color:var(--primary); font-weight:500">Say "Next" for hands-free</span>
+    </div>
+    
+    <button id="coupleGameBtn" onclick="openGame()">
+       <span>💕</span> Couple's Task Game
+    </button>
+
+    <div class="step-list" id="r-steps"></div>
+
+    <div class="section-head">You Might Also Like</div>
+    <div class="similar-scroll" id="similarList">
+        <div style="color:#888; font-size:12px">Loading suggestions...</div>
+    </div>
+
+    <div class="section-head">Video Tutorial</div>
+    <div id="video-container"></div>
+    <div style="height: 30px;"></div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <div style="font-size: 20px; font-weight: 700;">₹250</div>
+  <button class="btn-cook" onclick="addFullMeal()">Add Full Meal 🛒</button>
+</div>
+
+<script>
+if(localStorage.getItem("darkMode") === "yes") document.body.classList.add("dark-mode");
+let recipeData = {};
+let isSpeaking = false;
+let stepsArray = [];
+
+// --- 1. MODE CHECK & GAME LOGIC ---
+const currentMode = localStorage.getItem("appMode");
+if (currentMode === "couple") {
+    document.getElementById("coupleGameBtn").style.display = "flex";
+}
+
+function openGame() { document.getElementById("gameModal").style.display = "flex"; }
+function closeGame(e) { if(e.target.id === "gameModal") closeGameDirect(); }
+function closeGameDirect() { document.getElementById("gameModal").style.display = "none"; }
+
+function spinTask(btn, isDishes = false) {
+    if(btn.innerText !== "SPIN 🎰" && !btn.innerText.includes("SPIN")) return; 
+    
+    let count = 0;
+    const max = 15; 
+    const options = ["YOU", "PARTNER"];
+    
+    const interval = setInterval(() => {
+        btn.innerText = options[count % 2];
+        btn.style.backgroundColor = (count % 2 === 0) ? "#6c5ce7" : "#e84393";
+        count++;
+        
+        if (count > max) {
+            clearInterval(interval);
+            const winner = Math.random() < 0.5 ? "YOU" : "PARTNER";
+            btn.innerText = winner;
+            
+            if (winner === "YOU") {
+                btn.className = "task-result winner-you";
+            } else {
+                btn.className = "task-result winner-partner";
+                if(isDishes) dropConfetti();
+            }
+        }
+    }, 100);
+}
+
+function dropConfetti() {
+  const confettis = [];
+  for(let i=0; i<30; i++){
+    let c=document.createElement("div"); c.className="confetti";
+    c.style.left=Math.random()*100+"vw"; 
+    c.style.background=['#FF6B6B','#2ecc71','#f1c40f','#3498db'][Math.floor(Math.random()*4)];
+    c.style.top = -Math.random()*20+"vh"; 
+    c.style.width = Math.random()*10+5+"px";
+    c.style.height = Math.random()*10+5+"px";
+    c.style.animationDuration = (Math.random() * 2 + 2) + "s";
+    document.body.appendChild(c);
+    confettis.push(c);
+  }
+  
+  // STOP AFTER 3 SECONDS
+  setTimeout(() => {
+    confettis.forEach(c => c.remove());
+  }, 3000);
+}
+
+// --- 2. HANDS-FREE VOICE RECOGNITION ---
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.onresult = (event) => {
+        const cmd = event.results[event.results.length - 1][0].transcript.toLowerCase();
+        if (cmd.includes("next")) {
+           const nextStep = document.querySelector('.step-item:not(.done)');
+           if (nextStep) {
+               nextStep.classList.add('done');
+               const text = nextStep.querySelector('.step-text').innerText;
+               window.speechSynthesis.speak(new SpeechSynthesisUtterance("Next: " + text));
+           }
+        }
+        if (cmd.includes("stop")) stopVoice();
+    };
+    recognition.start();
+}
+
+function toggleVoice() {
+    if(isSpeaking) { stopVoice(); } 
+    else {
+        const text = `Recipe for ${recipeData.strMeal}. Instructions are: ` + recipeData.strInstructions;
+        const ut = new SpeechSynthesisUtterance(text);
+        ut.rate = 0.9;
+        window.speechSynthesis.speak(ut);
+        isSpeaking = true;
+        document.getElementById("speakBtn").innerText = "⏹";
+        document.getElementById("speakBtn").classList.add("listening");
+        ut.onend = () => stopVoice();
+    }
+}
+
+function stopVoice() {
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    const btn = document.getElementById("speakBtn");
+    if(btn) {
+        btn.innerText = "🔊";
+        btn.classList.remove("listening");
+    }
+}
+
+function goBack() { stopVoice(); window.history.back(); }
+
+// --- 3. DATA LOAD ---
+async function load(){
+  const id = localStorage.getItem("selectedRecipe");
+  const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+  const data = await res.json();
+  const meal = data.meals[0];
+  recipeData = meal;
+
+  document.getElementById("r-img").src = meal.strMealThumb;
+  document.getElementById("r-img").onload = function() { this.classList.add("loaded"); };
+  document.getElementById("r-title").innerText = meal.strMeal;
+  document.getElementById("r-cat").innerText = `${meal.strCategory} • ${meal.strArea}`;
+
+  // Nutrition Score
+  const cat = meal.strCategory.toLowerCase();
+  const score = document.getElementById("healthScore");
+  const desc = document.getElementById("healthDesc");
+  if(cat.includes('seafood') || cat.includes('chicken') || cat.includes('veget')) {
+      score.innerText = "A+"; score.style.color = "#2ecc71";
+      desc.innerText = "High protein, heart healthy choice.";
+  } else {
+      score.innerText = "B"; score.style.color = "#f1c40f";
+      desc.innerText = "Balanced meal, monitor portion size.";
+  }
+
+  // Ingredients
+  const list = document.getElementById("r-ingredients");
+  for(let i=1; i<=20; i++){
+    const ing = meal[`strIngredient${i}`];
+    const meas = meal[`strMeasure${i}`];
+    if(ing && ing.trim()){
+      list.innerHTML += `
+      <div class="ing-item" onclick="animateIngredient(event, '${ing}')">
+        <img src="https://www.themealdb.com/images/ingredients/${ing}.png" class="ing-img">
+        <div class="ing-info"><b>${meas}</b> ${ing}</div>
+        <div class="add-one">+</div>
+      </div>`;
+    }
+  }
+
+  // Steps
+  stepsArray = meal.strInstructions.split(/\r\n|\n|\./).filter(s => s.trim().length > 5);
+  const stepsBox = document.getElementById("r-steps");
+  stepsArray.forEach((s, i) => {
+    stepsBox.innerHTML += `
+      <div class="step-item" onclick="this.classList.toggle('done')">
+        <div class="step-num">${i+1}</div>
+        <div class="step-text">${s.trim()}.</div>
+      </div>`;
+  });
+
+  // Video - FIXED LOGIC
+  if(meal.strYoutube) {
+    let vidId = "";
+    if (meal.strYoutube.includes("v=")) {
+        vidId = meal.strYoutube.split("v=")[1].split("&")[0];
+    } else if (meal.strYoutube.includes("youtu.be/")) {
+        vidId = meal.strYoutube.split("youtu.be/")[1].split("?")[0];
+    }
+    
+    if(vidId) {
+        document.getElementById("video-container").innerHTML = `<div style="width:100%; aspect-ratio:16/9; border-radius:20px; overflow:hidden;"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe></div>`;
+    }
+  }
+  
+  loadSimilar(meal.strCategory);
+  updateCartBadge();
+}
+
+async function loadSimilar(cat){
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${cat}`);
+    const data = await res.json();
+    const list = document.getElementById("similarList");
+    if(data.meals){
+        const others = data.meals.filter(m => m.idMeal !== recipeData.idMeal).slice(0, 6);
+        list.innerHTML = others.map(m => `
+            <div class="sim-card" onclick="openSimilar('${m.idMeal}')">
+                <img src="${m.strMealThumb}" class="sim-img">
+                <div class="sim-title">${m.strMeal}</div>
+            </div>
+        `).join('');
+    }
+}
+
+function openSimilar(id){
+    localStorage.setItem("selectedRecipe", id);
+    location.reload();
+}
+
+// --- 4. CART & ANIMATIONS ---
+function animateIngredient(e, name) {
+  const sourceImg = e.currentTarget.querySelector('.ing-img');
+  const rect = sourceImg.getBoundingClientRect();
+  const cartRect = document.getElementById("viewCartBtn").getBoundingClientRect();
+  const flyImg = document.createElement("img");
+  flyImg.src = sourceImg.src; flyImg.classList.add("fly-img");
+  flyImg.style.top = rect.top + "px"; flyImg.style.left = rect.left + "px";
+  document.body.appendChild(flyImg);
+  setTimeout(() => {
+    flyImg.style.top = (cartRect.top) + "px"; flyImg.style.left = (cartRect.left) + "px";
+    flyImg.style.opacity = "0"; flyImg.style.transform = "scale(0.1)";
+  }, 50);
+  setTimeout(() => { flyImg.remove(); addOne(name); }, 1200);
+}
+
+function addOne(name){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let ex = cart.find(i => i.id === name);
+  if(ex) ex.qty++; else cart.push({ id: name, name, img: `https://www.themealdb.com/images/ingredients/${name}.png`, qty: 1, type: 'ingredient' });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartBadge(); showToast(`Added ${name}`);
+}
+
+function addFullMeal(){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const id = localStorage.getItem("selectedRecipe");
+  let ex = cart.find(i => i.id === id);
+  if(ex) ex.qty++; else cart.push({ id, name: recipeData.strMeal, img: recipeData.strMealThumb, qty: 1, type: 'meal' });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartBadge(); showToast("Full Meal Added!");
+}
+
+function updateCartBadge() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  document.getElementById("cartBadge").innerText = cart.reduce((a,b)=>a+b.qty,0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+load();
+</script>
+</body>
+</html>

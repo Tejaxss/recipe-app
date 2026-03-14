@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Status</title>
+<meta name="theme-color" content="#FF6B6B">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #FAFBFF; --card: #FFFFFF; --primary: #FF6B6B; --primary-dark: #FF4757; --text: #2D3436; }
+body.dark-mode { --bg: #121212; --card: #1E1E1E; --primary: #FF4757; --primary-dark: #ff6b81; --text: #F1F2F6; }
+
+body { 
+  background: var(--bg); color: var(--text); min-height: 100vh; 
+  display: flex; justify-content: center; align-items: center; 
+  font-family:'Poppins', sans-serif; margin:0; overflow-x: hidden; 
+}
+
+/* --- PHASE 1: LOADING SCREEN (Animation) --- */
+.loading-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  z-index: 1000;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  transition: opacity 0.5s ease;
+}
+
+/* Animated Elements */
+.cloud { position: absolute; background: rgba(255,255,255,0.1); border-radius: 50px; animation: moveLeft linear infinite; }
+.c1 { width: 120px; height: 40px; top: 15%; right: -120px; animation-duration: 6s; }
+.c2 { width: 80px; height: 30px; bottom: 20%; right: -80px; animation-duration: 4s; animation-delay: 1s; }
+
+.scooter-wrapper { 
+  font-size: 100px; 
+  animation: bounceSpeed 0.5s infinite alternate ease-in-out; 
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); margin-bottom: 20px;
+}
+@keyframes bounceSpeed { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-10px) rotate(2deg); } }
+@keyframes moveLeft { from { right: -150px; } to { right: 110%; } }
+
+.loading-text { 
+  font-weight: 800; font-size: 20px; color: #FFFFFF; letter-spacing: 2px; text-transform: uppercase; 
+}
+
+/* --- PHASE 2: RECEIPT CARD --- */
+.card { 
+  background: var(--card); padding: 30px; border-radius: 25px; text-align: center; width: 90%; max-width: 400px; 
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: none; position: relative; z-index: 20;
+  animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: 20px 0;
+}
+@keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+.success-icon { width: 60px; height: 60px; background: #e0f9e8; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #2ecc71; font-size: 30px; margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(46, 213, 115, 0.2); }
+
+/* Paper Styles */
+.receipt-paper { background: #fff; border: 1px solid #eee; padding: 20px; margin: 20px 0; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.03); text-align: left; color: #333; }
+/* jagged edge effect */
+.receipt-paper::after { content: ""; position: absolute; bottom: -10px; left: 0; width: 100%; height: 10px; background: radial-gradient(circle, transparent 50%, #fff 50%) 0 -10px; background-size: 20px 20px; transform: rotate(180deg); }
+body.dark-mode .receipt-paper { background: #F9F9F9; border: none; } /* Paper always light for contrast */
+
+.r-header { text-align: center; margin-bottom: 15px; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
+.r-store { font-weight: 800; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #333; }
+.r-meta { font-size: 10px; color: #666; margin-top: 5px; font-family: 'Space Mono', monospace; }
+
+.r-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #333; }
+.r-price { font-family: 'Space Mono', monospace; font-weight: 600; }
+.r-divider { border-top: 2px dashed #ddd; margin: 15px 0; }
+.r-total { font-weight: 800; font-size: 20px; color: #333; margin-top: 5px; }
+
+/* RATING STARS */
+.star-rating { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.star { font-size: 25px; color: #ddd; cursor: pointer; transition: 0.2s; }
+.star.active { color: #f1c40f; transform: scale(1.2); }
+
+/* BUTTONS */
+.btn-group { display: flex; flex-direction: column; gap: 10px; }
+.btn-home { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(255,107,107,0.3); transition: 0.3s; }
+.btn-print { width: 100%; padding: 12px; background: transparent; color: var(--text); border: 2px solid rgba(0,0,0,0.1); border-radius: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; gap: 8px; align-items: center; }
+.btn-print:hover { background: rgba(0,0,0,0.05); }
+
+/* CONFETTI */
+.confetti { position: fixed; width: 10px; height: 10px; animation: fall 3s linear infinite; z-index: 500; pointer-events: none; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+/* PRINT STYLES */
+@media print {
+  .loading-screen, .btn-group, .star-rating, h2, p, .success-icon { display: none !important; }
+  body, .card { background: white; box-shadow: none; width: 100%; max-width: 100%; position: absolute; top:0; left:0; }
+  .receipt-paper { box-shadow: none; border: 2px solid #000; width: 100%; margin: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loader">
+  <div class="cloud c1"></div><div class="cloud c2"></div>
+  <div class="scooter-wrapper">🛵</div>
+  <div class="loading-text" id="status-text">CONFIRMING...</div>
+</div>
+
+<div class="card" id="receipt">
+  <div class="success-icon">✓</div>
+  <h2 style="margin-bottom:5px">Order Confirmed!</h2>
+  <p style="color:var(--subtext); font-size:12px; margin-bottom:20px">Your ingredients are being gathered.</p>
+  
+  <div style="font-size:12px; font-weight:600; color:var(--subtext); margin-bottom:5px">RATE YOUR EXPERIENCE</div>
+  <div class="star-rating">
+    <span class="star" onclick="rate(1)">★</span>
+    <span class="star" onclick="rate(2)">★</span>
+    <span class="star" onclick="rate(3)">★</span>
+    <span class="star" onclick="rate(4)">★</span>
+    <span class="star" onclick="rate(5)">★</span>
+  </div>
+
+  <div class="receipt-paper" id="printArea">
+    <div class="r-header">
+      <div class="r-store">Recipe Master</div>
+      <div class="r-meta" id="r-date"></div>
+      <div class="r-meta">ORDER #<span id="r-id"></span></div>
+    </div>
+    <div id="r-items"></div>
+    <div class="r-divider"></div>
+    <div class="r-row"><span style="color:#666">Item Total</span> <span class="r-price" id="r-sub">₹0</span></div>
+    <div class="r-row"><span style="color:#666">Taxes (5%)</span> <span class="r-price" id="r-tax">₹0</span></div>
+    <div class="r-row"><span style="color:#666">Delivery</span> <span style="color:#2ecc71; font-weight:bold">FREE</span></div>
+    <div class="r-divider"></div>
+    <div class="r-row r-total"><span>TOTAL PAID</span> <span class="r-price" id="r-total">₹0</span></div>
+    <div class="r-meta" style="text-align:center; margin-top:15px">Paid via Credit Card •••• 4242</div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn-home" onclick="location.href='index1.html'">Cook More 🍳</button>
+    <button class="btn-print" onclick="window.print()">🖨 Download Invoice</button>
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("darkMode")==="yes") document.body.classList.add("dark-mode");
+
+// --- ANIMATION SEQUENCE ---
+const statuses = ["CONFIRMING...", "COOKING...", "PACKING...", "ON THE WAY!"];
+let step = 0;
+const statusEl = document.getElementById("status-text");
+
+const statusInt = setInterval(() => {
+  step++;
+  if(step < statuses.length) {
+    statusEl.style.opacity = 0;
+    setTimeout(() => { statusEl.innerText = statuses[step]; statusEl.style.opacity = 1; }, 100);
+  }
+}, 600); // Faster updates for better UX
+
+setTimeout(() => {
+  clearInterval(statusInt);
+  const loader = document.getElementById("loader");
+  loader.style.opacity = "0";
+  setTimeout(() => {
+    loader.style.display = "none";
+    document.getElementById("receipt").style.display = "block";
+    dropConfetti();
+  }, 500);
+}, 2500); // 2.5s total wait
+
+// --- RECEIPT DATA ---
+const order = JSON.parse(localStorage.getItem("lastOrder"))||[];
+const orderId = Math.floor(100000 + Math.random() * 900000);
+const now = new Date();
+document.getElementById("r-id").innerText = orderId;
+document.getElementById("r-date").innerText = `${now.toLocaleDateString()} • ${now.toLocaleTimeString()}`;
+
+let subtotal = 0;
+document.getElementById("r-items").innerHTML = order.map(i => {
+  const price = i.type === 'meal' ? 250 : 40;
+  subtotal += price * i.qty;
+  return `<div class="r-row"><span><b>${i.qty}x</b> ${i.name}</span><span class="r-price">₹${price * i.qty}</span></div>`;
+}).join('');
+
+const tax = Math.round(subtotal * 0.05);
+document.getElementById("r-sub").innerText = "₹" + subtotal;
+document.getElementById("r-tax").innerText = "₹" + tax;
+document.getElementById("r-total").innerText = "₹" + (subtotal + tax);
+
+// --- RATING LOGIC ---
+function rate(n) {
+  const stars = document.querySelectorAll(".star");
+  stars.forEach((s, i) => {
+    if(i < n) s.classList.add("active");
+    else s.classList.remove("active");
+  });
+  // Optional: Save rating to DB or show "Thank you" toast
+}
+
+// --- CONFETTI ---
+function dropConfetti() {
+  for(let i=0; i<30; i++){
+    let c=document.createElement("div"); c.className="confetti";
+    c.style.left=Math.random()*100+"vw"; 
+    c.style.background=['#FF6B6B','#2ecc71','#f1c40f','#3498db'][Math.floor(Math.random()*4)];
+    c.style.top = -Math.random()*20+"vh"; 
+    c.style.width = Math.random()*10+5+"px";
+    c.style.height = Math.random()*10+5+"px";
+    c.style.animationDuration = (Math.random() * 2 + 2) + "s";
+    document.body.appendChild(c);
+  }
+}
+</script>
+</body>
+</html>

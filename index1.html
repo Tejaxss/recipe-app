@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Master</title>
+<meta name="theme-color" content="#FF6B6B">
+<link rel="preconnect" href="https://www.themealdb.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- THEME BASE --- */
+:root { 
+  --bg: #FAFBFF; 
+  --card: #FFFFFF; 
+  --primary: #FF6B6B; 
+  --text: #2D3436; 
+  --subtext: #Aeb3b9; 
+  --tint: transparent;
+  --pattern: none; 
+}
+
+body.dark-mode { 
+  --bg: #121212; 
+  --card: #1E1E1E; 
+  --text: #F1F2F6; 
+  --subtext: #A4B0BE; 
+}
+
+/* --- PRO THEME PATTERNS & VIBRANT COLORS --- */
+
+/* 1. MATE MODE: Electric Sky Blue 🎮🍕 */
+body.mode-mate { 
+  --primary: #00a8ff; 
+  --bg: linear-gradient(180deg, #f0fbff 0%, #FAFBFF 100%);
+  --tint: rgba(0, 168, 255, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300a8ff' fill-opacity='0.08'%3E%3Cpath d='M50 50l-10 20h20zM50 55l3 5h-6z' /%3E%3Cpath d='M20 20c0-6 4-10 10-10s10 4 10 10v5H20v-5zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3Ccircle cx='60' cy='20' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.dark-mode.mode-mate { 
+  --bg: linear-gradient(180deg, #051929 0%, #121212 100%); 
+  --tint: rgba(0, 168, 255, 0.15);
+  --pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300a8ff' fill-opacity='0.1'%3E%3Cpath d='M50 50l-10 20h20z' /%3E%3Cpath d='M20 20c0-6 4-10 10-10s10 4 10 10v5H20v-5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 2. COUPLE MODE: Vibrant Hot Pink ❤️🍷 */
+body.mode-couple { 
+  --primary: #ef5777; 
+  --bg: linear-gradient(180deg, #fff0f3 0%, #FAFBFF 100%);
+  --tint: rgba(239, 87, 119, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef5777' fill-opacity='0.08'%3E%3Cpath d='M30 10c-3-4-8-4-11 0-3 4-3 9 0 13l11 11 11-11c3-4 3-9 0-13-3-4-8-4-11 0z' /%3E%3Cpath d='M10 40h10v10H10z' transform='rotate(45 15 45)' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.dark-mode.mode-couple { 
+  --bg: linear-gradient(180deg, #2d0a12 0%, #121212 100%);
+  --tint: rgba(239, 87, 119, 0.15);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef5777' fill-opacity='0.1'%3E%3Cpath d='M30 10c-3-4-8-4-11 0-3 4-3 9 0 13l11 11 11-11c3-4 3-9 0-13-3-4-8-4-11 0z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 3. SINGLE MODE: Bright Mint 🌿🎧 */
+body.mode-single { 
+  --primary: #0be881; 
+  --bg: linear-gradient(180deg, #e8fcf0 0%, #FAFBFF 100%);
+  --tint: rgba(11, 232, 129, 0.04);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230be881' fill-opacity='0.08'%3E%3Cpath d='M30 30c-10 0-20-10-20-20 0 10 10 20 20 20s20-10 20-20c0 10-10 20-20 20z' /%3E%3Ccircle cx='10' cy='50' r='3'/%3E%3Ccircle cx='18' cy='45' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.dark-mode.mode-single { 
+  --bg: linear-gradient(180deg, #062113 0%, #121212 100%);
+  --tint: rgba(11, 232, 129, 0.15);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230be881' fill-opacity='0.1'%3E%3Cpath d='M30 30c-10 0-20-10-20-20 0 10 10 20 20 20s20-10 20-20c0 10-10 20-20 20z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
+
+/* BODY BACKGROUND SETUP */
+body { 
+  background-color: var(--bg); 
+  background-image: var(--pattern), var(--bg);
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed;
+  color: var(--text); 
+  padding-bottom: 100px; 
+  transition: 0.3s; 
+  min-height: 100vh;
+}
+
+/* Header & Search */
+.header { 
+  padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; 
+  background: rgba(255, 255, 255, 0.85); 
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 90; 
+  box-shadow: 0 4px 30px rgba(0,0,0,0.03); 
+}
+body.dark-mode .header { background: rgba(30, 30, 30, 0.85); }
+
+.header-icons { display: flex; align-items: center; gap: 15px; }
+.profile-btn-header {
+  width: 35px; height: 35px; background: var(--card); border-radius: 50%; 
+  display: flex; justify-content: center; align-items: center; cursor: pointer; 
+  font-size: 18px; border: 1px solid rgba(0,0,0,0.05); transition: 0.2s;
+  color: var(--primary); 
+}
+.profile-btn-header:active { transform: scale(0.9); }
+
+.search-wrap { padding: 15px 5% 5px 5%; position: relative; }
+.search-input { width: 100%; padding: 15px 50px 15px 20px; border: none; border-radius: 15px; background: var(--card); box-shadow: 0 5px 20px rgba(0,0,0,0.05); color: var(--text); transition: 0.3s; }
+.search-input:focus { box-shadow: 0 5px 20px rgba(0,0,0,0.1); transform: scale(1.01); border: 1px solid var(--primary); }
+
+/* --- GAME BUTTON --- */
+.spin-btn-wrap { padding: 5px 5% 20px 5%; display: flex; justify-content: flex-start; } 
+.spin-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px; 
+  background: var(--primary); 
+  color: white; /* White text stands out better on brighter backgrounds */
+  border: none; border-radius: 50px; font-size: 12px; font-weight: 600;
+  cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+}
+.spin-btn:active { transform: scale(0.95); }
+
+/* --- MODAL --- */
+#slotModal {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+  background: rgba(0,0,0,0.85); z-index: 2000; 
+  justify-content: center; align-items: center; flex-direction: column;
+  backdrop-filter: blur(8px); animation: fadeIn 0.3s ease;
+}
+#resultCard {
+  display: none; background: var(--card); width: 80%; max-width: 320px;
+  border-radius: 25px; padding: 25px; text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#resImg { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: -60px auto 15px auto; border: 5px solid var(--card); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+#resTitle { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: var(--text); }
+.cook-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 600; font-size: 14px; margin-top: 15px; cursor: pointer; }
+.spin-again-btn { width: 100%; padding: 12px; background: transparent; color: var(--primary); border: 2px solid var(--primary); border-radius: 15px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes popUp { from { opacity:0; transform: scale(0.8) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+
+/* CARDS & GRID */
+.grid { display: grid; gap: 20px; padding: 0 5%; grid-template-columns: repeat(auto-fill, minmax(160px, 200px)); min-height: 400px; align-items: start; }
+.card { 
+  background: var(--card); 
+  border-radius: 20px; cursor: pointer; 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-image: linear-gradient(to bottom right, var(--card), var(--tint));
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.card-img { height: 150px; position: relative; overflow: hidden; border-radius: 20px 20px 0 0; } 
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.card:hover .card-img img { transform: scale(1.1); } 
+
+.section-title { padding: 0 5%; font-size: 18px; font-weight: 700; margin: 20px 0 10px 0; color: var(--text); }
+.scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 0 5% 20px 5%; scrollbar-width: none; }
+.trend-card { min-width: 260px; height: 160px; border-radius: 20px; position: relative; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.trend-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.trend-card:hover img { transform: scale(1.1); } 
+
+/* PILLS */
+.cat-pill { 
+  padding: 10px 22px; background: var(--card); border-radius: 30px; 
+  font-size: 13px; font-weight: 600; color: var(--subtext); cursor: pointer; 
+  white-space: nowrap; transition: 0.3s; border: 1px solid transparent; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
+}
+.cat-pill.active { 
+  background: var(--primary); color: #fff; transform: scale(1.05); 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-color: transparent; 
+}
+
+/* BOTTOM BAR */
+.bottom-bar { 
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 65px; 
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+  border-radius: 40px; display: flex; justify-content: space-evenly; align-items: center; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1); z-index: 100; animation: floatUp 0.8s ease; 
+}
+body.dark-mode .bottom-bar { background: rgba(30, 30, 30, 0.9); }
+
+@keyframes floatUp { from { transform: translateX(-50%) translateY(50px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+.nav-btn { font-size: 22px; cursor: pointer; color: var(--subtext); display:flex; flex-direction:column; align-items:center; transition: 0.2s; position: relative; background: none; border: none; }
+.nav-btn.active { color: var(--primary); transform: translateY(-5px); }
+.nav-btn span { font-size: 10px; font-weight: 600; margin-top: 2px; }
+.badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--card); font-weight: bold; }
+
+.skeleton { background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+body.dark-mode .skeleton { background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%); }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+#toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 25px; border-radius: 30px; font-size: 14px; font-weight: 600; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+#toast.show { opacity: 1; visibility: visible; bottom: 110px; }
+</style>
+</head>
+<body>
+
+<div id="toast">Message</div>
+
+<div id="slotModal" onclick="closeModal(event)">
+  <div id="spinnerView">
+    <div style="font-size: 80px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,255,255,0.5);" id="slotEmoji">🍔</div>
+    <h2 style="color: white; font-family: 'Poppins'; text-align:center" id="spinnerText">Finding your dinner...</h2>
+  </div>
+
+  <div id="resultCard" onclick="event.stopPropagation()">
+    <img id="resImg" src="">
+    <div style="color:var(--subtext); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px">Your Meal Today</div>
+    <div id="resTitle">Meal Name</div>
+    <button class="cook-btn" id="cookBtn">Let's Cook 👨‍🍳</button>
+    <button class="spin-again-btn" onclick="spinForDinner()">Spin Again 🔄</button>
+    <div style="margin-top:15px; font-size:12px; color:var(--subtext); cursor:pointer" onclick="closeModalDirect()">Close</div>
+  </div>
+</div>
+
+<div class="header">
+  <div><div style="font-size:14px; color:var(--subtext)" id="greet">Hello</div><div style="font-size:20px; font-weight:700" id="mainTitle">Master Chef 🇮🇳</div></div>
+  <div class="header-icons">
+    <button onclick="toggleTheme()" style="background:none; border:none; font-size:20px; cursor:pointer; transition:0.3s" id="themeIcon">🌙</button>
+    <div class="profile-btn-header" onclick="location.href='profile.html'">👨‍🍳</div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input class="search-input" id="search" placeholder="Search recipes...">
+  <button onclick="voice()" style="position:absolute; right:7%; top:50%; transform:translateY(-50%); background:none; border:none; font-size:20px; cursor:pointer">🎤</button>
+</div>
+
+<div class="spin-btn-wrap">
+  <button class="spin-btn" onclick="spinForDinner()" id="gameBtn">
+    <span style="font-size: 16px">🎲</span> Dinner? idk 🤷‍♂️
+  </button>
+</div>
+
+<div class="section-title" id="trendTitle">Trending in India 🔥</div>
+<div class="scroll-container" id="trend">
+  <div class="trend-card skeleton"></div><div class="trend-card skeleton"></div>
+</div>
+
+<div class="section-title">Categories</div>
+<div class="scroll-container" id="cats"></div>
+
+<div class="section-title" id="grid-title">All Recipes</div>
+<div class="grid" id="grid">
+  <div class="card skeleton" style="height:220px"></div><div class="card skeleton" style="height:220px"></div>
+</div>
+
+<div class="bottom-bar">
+  <button class="nav-btn active" onclick="location.href='index1.html'">
+    <div id="navHomeIcon">🏠</div><span id="navHomeText">Home</span>
+  </button>
+  <button class="nav-btn" onclick="location.href='cart.html'">
+    <div id="cartCount" class="badge" style="display:none">0</div>
+    <div id="navCartIcon">🛒</div><span id="navCartText">Cart</span>
+  </button>
+  <button class="nav-btn" onclick="location.href='favourites.html'">
+    <div id="navFavIcon">❤️</div><span id="navFavText">Favs</span>
+  </button>
+  <button class="nav-btn" onclick="location.href='profile.html'">
+    <div id="navProfIcon">👤</div><span id="navProfText">Profile</span>
+  </button>
+</div>
+
+<script>
+if(!sessionStorage.getItem("loggedIn")) location.href="login.html";
+if(localStorage.getItem("darkMode")==="yes"){document.body.classList.add("dark-mode"); document.getElementById("themeIcon").innerText="☀️";}
+
+// --- IMMERSIVE THEME ENGINE ---
+const mode = localStorage.getItem("appMode") || "single";
+// Add the mode class to the body tag immediately
+document.body.classList.add("mode-" + mode);
+
+function updateNavTheme() {
+    const navConfig = {
+        mate: { home: "🏰", homeTxt: "Base", cart: "💰", cartTxt: "Loot", fav: "⭐", favTxt: "Stars", prof: "💀", profTxt: "Captain" },
+        couple: { home: "💒", homeTxt: "Nest", cart: "🧺", cartTxt: "Basket", fav: "💘", favTxt: "Loves", prof: "💞", profTxt: "Us" },
+        single: { home: "⛺", homeTxt: "Den", cart: "🎒", cartTxt: "Stash", fav: "🍀", favTxt: "Luck", prof: "🧘", profTxt: "Me" }
+    };
+    const cfg = navConfig[mode] || navConfig.single;
+    document.getElementById("navHomeIcon").innerText = cfg.home; document.getElementById("navHomeText").innerText = cfg.homeTxt;
+    document.getElementById("navCartIcon").innerText = cfg.cart; document.getElementById("navCartText").innerText = cfg.cartTxt;
+    document.getElementById("navFavIcon").innerText = cfg.fav; document.getElementById("navFavText").innerText = cfg.favTxt;
+    document.getElementById("navProfIcon").innerText = cfg.prof; document.getElementById("navProfText").innerText = cfg.profTxt;
+}
+updateNavTheme();
+
+// --- TEXT & LOGIC ---
+const greetEl = document.getElementById("greet");
+const titleEl = document.getElementById("mainTitle");
+const gameBtn = document.getElementById("gameBtn");
+const spinnerText = document.getElementById("spinnerText");
+
+if(mode === "mate"){
+  greetEl.innerText = "Ahoy, Captain! 🏴‍☠️";
+  titleEl.innerText = "Squad Kitchen";
+  gameBtn.innerHTML = "<span style='font-size:16px'>🍕</span> Spin for the Crew";
+  spinnerText.innerText = "Feeding the squad...";
+  document.getElementById("trendTitle").innerText = "Party Favorites 🎉";
+} 
+else if(mode === "couple"){
+  greetEl.innerText = "Hello, Lovebirds 💑";
+  titleEl.innerText = "Romantic Dining";
+  gameBtn.innerHTML = "<span style='font-size:16px'>🍷</span> Romantic Roulette";
+  spinnerText.innerText = "Setting the mood...";
+  document.getElementById("trendTitle").innerText = "Date Night Specials ❤️";
+} 
+else {
+  greetEl.innerText = new Date().getHours()<12?"Good Morning,":"Good Evening,";
+  titleEl.innerText = "Chef's Table 🥗";
+  gameBtn.innerHTML = "<span style='font-size:16px'>🎲</span> Quick Meal Spin";
+  document.getElementById("trendTitle").innerText = "Quick & Healthy ⚡";
+}
+
+async function init(){
+  updateBadge();
+  await loadCats();
+  loadAll();
+}
+
+function showMsg(m) {
+  const t = document.getElementById("toast");
+  t.innerText = m; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+function spinForDinner() {
+  const modal = document.getElementById("slotModal");
+  const spinnerView = document.getElementById("spinnerView");
+  const resultCard = document.getElementById("resultCard");
+  const emojiDisplay = document.getElementById("slotEmoji");
+  
+  modal.style.display = "flex";
+  spinnerView.style.display = "block";
+  resultCard.style.display = "none";
+  
+  const foods = ["🍔", "🍕", "🌮", "🥗", "🍝", "🍛", "🥘", "🍣", "🍱", "🥟"];
+  let counter = 0;
+  
+  const interval = setInterval(() => {
+    emojiDisplay.innerText = foods[counter % foods.length];
+    counter++;
+  }, 100);
+
+  let apiUrl = "https://www.themealdb.com/api/json/v1/1/random.php";
+  
+  fetch(apiUrl)
+    .then(res => res.json()).then(data => {
+      const meal = data.meals[0];
+      setTimeout(() => {
+        clearInterval(interval);
+        emojiDisplay.innerText = "🎉";
+        setTimeout(() => {
+            document.getElementById("resImg").src = meal.strMealThumb;
+            document.getElementById("resTitle").innerText = meal.strMeal;
+            document.getElementById("cookBtn").onclick = function() {
+                localStorage.setItem("selectedRecipe", meal.idMeal);
+                window.location.href = "recipe2.html";
+            };
+            spinnerView.style.display = "none";
+            resultCard.style.display = "block";
+        }, 500);
+      }, 1500);
+    });
+}
+
+function closeModal(e) { if(e.target.id === "slotModal") document.getElementById("slotModal").style.display = "none"; }
+function closeModalDirect() { document.getElementById("slotModal").style.display = "none"; }
+
+async function loadAll(){
+  document.querySelectorAll(".cat-pill").forEach(b=>b.classList.remove("active"));
+  if(document.getElementById("all-pill")) document.getElementById("all-pill").classList.add("active");
+  document.getElementById("grid-title").innerText = "All Recipes";
+  
+  const r = await fetch("https://www.themealdb.com/api/json/v1/1/search.php?s=");
+  const d = await r.json();
+  render(d.meals);
+  
+  let trendQuery = "Indian"; // Default
+  if(mode === "mate") trendQuery = "American"; 
+  if(mode === "couple") trendQuery = "Italian"; 
+
+  const trendRes = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${trendQuery}`);
+  const trendData = await trendRes.json();
+  const shuf = [...trendData.meals].slice(0,4);
+  document.getElementById("trend").innerHTML = shuf.map(m=>`<div class="trend-card" onclick="openR('${m.idMeal}')"><img src="${m.strMealThumb}"><div style="position:absolute;bottom:0;background:linear-gradient(to top, rgba(0,0,0,0.8), transparent);color:#fff;width:100%;padding:15px;font-weight:600">${m.strMeal}</div></div>`).join('');
+}
+
+async function loadCats(){
+  const r = await fetch("https://www.themealdb.com/api/json/v1/1/list.php?c=list");
+  const d = await r.json();
+  const container = document.getElementById("cats");
+  
+  let specialPill = "";
+  if(mode === "mate") specialPill = `<div class="cat-pill" onclick="fetchC('Chicken', this)">🍗 Party Chicken</div>`;
+  if(mode === "couple") specialPill = `<div class="cat-pill" onclick="fetchC('Dessert', this)">🍰 Date Night</div>`;
+  if(mode === "single") specialPill = `<div class="cat-pill" onclick="fetchC('Vegetarian', this)">🥗 Healthy Greens</div>`;
+
+  container.innerHTML = `
+    <div class="cat-pill active" id="all-pill" onclick="loadAll()">🌍 All</div>
+    ${specialPill}
+    <div class="cat-pill" id="indian-pill" onclick="fetchArea('Indian', this)">🇮🇳 Indian</div>`;
+    
+  d.meals.forEach(c => {
+    container.innerHTML += `<div class="cat-pill" onclick="fetchC('${c.strCategory}', this)">${c.strCategory}</div>`;
+  });
+}
+
+async function fetchArea(area, btn){
+  document.querySelectorAll(".cat-pill").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("grid-title").innerText = area + " Specials";
+  document.getElementById("grid").innerHTML=`<div class="card skeleton" style="height:220px"></div><div class="card skeleton" style="height:220px"></div>`;
+  const r = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`);
+  const d = await r.json(); render(d.meals);
+}
+
+async function fetchC(c, btn){
+  document.querySelectorAll(".cat-pill").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("grid-title").innerText = c + " Recipes";
+  document.getElementById("grid").innerHTML=`<div class="card skeleton" style="height:220px"></div><div class="card skeleton" style="height:220px"></div>`;
+  const r = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${c}`);
+  const d = await r.json(); render(d.meals);
+}
+
+function render(list){
+  const favs = JSON.parse(localStorage.getItem("favRecipes"))||[];
+  const grid = document.getElementById("grid");
+  if(!list) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--subtext);">No recipes found.</div>`;
+    return;
+  }
+  grid.innerHTML = list.map((m, index) => `
+    <div class="card" onclick="openR('${m.idMeal}')" style="animation-delay: ${index * 20}ms">
+      <div class="card-img">
+        <div style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.95);border-radius:50%;width:30px;height:30px;display:flex;justify-content:center;align-items:center;color:${favs.includes(m.idMeal)?'#FF4757':'#ccc'};box-shadow:0 2px 5px rgba(0,0,0,0.1);z-index:2;transition:0.3s" onclick="fav('${m.idMeal}',this,event)">♥</div>
+        <img src="${m.strMealThumb}" loading="lazy">
+      </div>
+      <div style="padding:12px;">
+        <h3 style="font-size:14px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.strMeal}</h3>
+        <button style="width:100%;background:var(--bg);color:var(--text);border:1px solid rgba(0,0,0,0.05);padding:8px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:0.3s" onclick="addC(event,'${m.idMeal}','${m.strMeal}','${m.strMealThumb}', this)">Add +</button>
+      </div>
+    </div>`).join('');
+}
+
+function openR(id){ localStorage.setItem("selectedRecipe",id); location.href="recipe2.html"; }
+
+function fav(id,b,e){ 
+  e.stopPropagation(); 
+  b.style.transform = "scale(1.4)"; setTimeout(()=>b.style.transform="scale(1)", 200); 
+  let f=JSON.parse(localStorage.getItem("favRecipes"))||[]; 
+  if(f.includes(id)) { f=f.filter(x=>x!==id); showMsg("Removed from Favorites 💔"); }
+  else { f.push(id); showMsg("Added to Favorites ❤️"); }
+  localStorage.setItem("favRecipes",JSON.stringify(f)); b.style.color=f.includes(id)?'#FF4757':'#ccc'; 
+}
+
+function addC(e,id,n,i,btn){ 
+  e.stopPropagation(); 
+  btn.style.transform = "scale(0.95)";
+  btn.style.background = "var(--primary)"; btn.style.color = "white"; btn.innerText = "Added ✓";
+  showMsg("Added to Cart 🛒");
+  setTimeout(()=> { btn.style.background = "var(--bg)"; btn.style.color = "var(--text)"; btn.innerText = "Add +"; btn.style.transform = "scale(1)"; }, 1000);
+  let c=JSON.parse(localStorage.getItem("cart"))||[];
+  let x=c.find(z=>z.id===id && z.type==='meal'); if(x)x.qty++; else c.push({id,name:n,img:i,qty:1,type:'meal'});
+  localStorage.setItem("cart",JSON.stringify(c)); 
+  updateBadge();
+}
+
+function updateBadge(){
+  let c=JSON.parse(localStorage.getItem("cart"))||[];
+  let n=c.reduce((a,b)=>a+b.qty,0);
+  const b=document.getElementById("cartCount");
+  if(b){ b.innerText=n; b.style.display=n>0?"flex":"none"; }
+}
+
+function toggleTheme(){ 
+  document.body.classList.toggle("dark-mode"); 
+  localStorage.setItem("darkMode",document.body.classList.contains("dark-mode")?"yes":"no"); 
+  document.getElementById("themeIcon").innerText = document.body.classList.contains("dark-mode") ? "☀️" : "🌙"; 
+}
+
+function voice(){ 
+  const r=new webkitSpeechRecognition(); r.start(); 
+  r.onresult=e=>{
+    const term = e.results[0][0].transcript;
+    document.getElementById("search").value=term; 
+    fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`).then(x=>x.json()).then(y=>render(y.meals));
+  }
+}
+
+// SEARCH DEBOUNCE
+let searchTimeout = null;
+document.getElementById("search").addEventListener("input", e => {
+    const term = e.target.value.trim();
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        if(term.length > 0) {
+            fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`)
+            .then(x => x.json())
+            .then(y => render(y.meals));
+        } else {
+            loadAll(); 
+        }
+    }, 400); 
+});
+
+init();
+</script>
+</body>
+</html>

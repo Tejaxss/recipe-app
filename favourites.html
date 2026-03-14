@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Favorites</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- THEME BASE --- */
+:root { 
+  --bg: #FAFBFF; --card: #FFFFFF; --primary: #FF6B6B; --text: #2D3436; --subtext: #Aeb3b9; 
+  --shadow: 0 5px 20px rgba(0,0,0,0.05); --tint: transparent; --pattern: none;
+}
+body.dark-mode { --bg: #121212; --card: #1E1E1E; --text: #F1F2F6; --subtext: #A4B0BE; }
+
+/* --- MODES --- */
+body.mode-mate { 
+  --primary: #00a8ff; 
+  --bg: linear-gradient(180deg, #f1f4ff 0%, #FAFBFF 100%);
+  --tint: rgba(0, 168, 255, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300a8ff' fill-opacity='0.08'%3E%3Cpath d='M50 50l-10 20h20zM50 55l3 5h-6z' /%3E%3Cpath d='M20 20c0-6 4-10 10-10s10 4 10 10v5H20v-5zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3Ccircle cx='60' cy='20' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.mode-couple { 
+  --primary: #ef5777; 
+  --bg: linear-gradient(180deg, #fff0f3 0%, #FAFBFF 100%);
+  --tint: rgba(239, 87, 119, 0.03);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef5777' fill-opacity='0.08'%3E%3Cpath d='M30 10c-3-4-8-4-11 0-3 4-3 9 0 13l11 11 11-11c3-4 3-9 0-13-3-4-8-4-11 0z' /%3E%3Cpath d='M10 40h10v10H10z' transform='rotate(45 15 45)' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+body.mode-single { 
+  --primary: #0be881; 
+  --bg: linear-gradient(180deg, #e8fcf0 0%, #FAFBFF 100%);
+  --tint: rgba(11, 232, 129, 0.04);
+  --pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230be881' fill-opacity='0.08'%3E%3Cpath d='M30 30c-10 0-20-10-20-20 0 10 10 20 20 20s20-10 20-20c0 10-10 20-20 20z' /%3E%3Ccircle cx='10' cy='50' r='3'/%3E%3Ccircle cx='18' cy='45' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+body { background-color: var(--bg); background-image: var(--pattern), var(--bg); background-attachment: fixed; color: var(--text); padding-bottom: 100px; }
+
+.header { padding: 20px 5%; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); position: sticky; top:0; z-index:10; font-size: 20px; font-weight:700; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
+body.dark-mode .header { background: rgba(30,30,30,0.85); }
+
+.grid { display: grid; gap: 15px; padding: 20px 5%; grid-template-columns: 1fr; }
+.card { background: var(--card); border-radius: 15px; display: flex; align-items: center; padding: 10px; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; border: 1px solid transparent; background-image: linear-gradient(to right, var(--card), var(--tint)); }
+.card:hover { transform: translateX(5px); }
+.card img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
+.card-info { flex: 1; padding: 0 15px; }
+.btn-remove { background: #ff4757; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+
+/* BOTTOM BAR */
+.bottom-bar { 
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 65px; 
+  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+  border-radius: 40px; display: flex; justify-content: space-evenly; align-items: center; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1); z-index: 1000;
+}
+body.dark-mode .bottom-bar { background: rgba(30, 30, 30, 0.95); }
+.nav-btn { font-size: 22px; cursor: pointer; color: var(--subtext); display:flex; flex-direction:column; align-items:center; transition: 0.2s; position: relative; background:none; border:none; }
+.nav-btn.active { color: var(--primary); transform: translateY(-5px); }
+.nav-btn span { font-size: 10px; font-weight: 600; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div id="pageTitle">Favorites ❤️</div>
+  <button onclick="window.location.href='index1.html'" style="background:none; border:none; font-size:16px; cursor:pointer">⬅</button>
+</div>
+
+<div class="grid" id="favGrid">
+  <div style="text-align:center; color:var(--subtext); padding:40px;">Loading...</div>
+</div>
+
+<div class="bottom-bar">
+  <button class="nav-btn" onclick="location.href='index1.html'">
+    <div id="navHomeIcon">🏠</div><span id="navHomeText">Home</span>
+  </button>
+  <button class="nav-btn" onclick="location.href='cart.html'">
+    <div id="navCartIcon">🛒</div><span id="navCartText">Cart</span>
+  </button>
+  <button class="nav-btn active" onclick="location.href='favourites.html'">
+    <div id="navFavIcon">❤️</div><span id="navFavText">Favs</span>
+  </button>
+  <button class="nav-btn" onclick="location.href='profile.html'">
+    <div id="navProfIcon">👤</div><span id="navProfText">Profile</span>
+  </button>
+</div>
+
+<script>
+if(localStorage.getItem("darkMode")==="yes") document.body.classList.add("dark-mode");
+
+const mode = localStorage.getItem("appMode") || "single";
+document.body.classList.add("mode-" + mode);
+
+function updateNavTheme() {
+    const navConfig = {
+        mate: { home: "🏰", homeTxt: "Base", cart: "💰", cartTxt: "Loot", fav: "⭐", favTxt: "Stars", prof: "💀", profTxt: "Captain" },
+        couple: { home: "💒", homeTxt: "Nest", cart: "🧺", cartTxt: "Basket", fav: "💘", favTxt: "Loves", prof: "💞", profTxt: "Us" },
+        single: { home: "⛺", homeTxt: "Den", cart: "🎒", cartTxt: "Stash", fav: "🍀", favTxt: "Luck", prof: "🧘", profTxt: "Me" }
+    };
+    const cfg = navConfig[mode] || navConfig.single;
+    document.getElementById("navHomeIcon").innerText = cfg.home; document.getElementById("navHomeText").innerText = cfg.homeTxt;
+    document.getElementById("navCartIcon").innerText = cfg.cart; document.getElementById("navCartText").innerText = cfg.cartTxt;
+    document.getElementById("navFavIcon").innerText = cfg.fav; document.getElementById("navFavText").innerText = cfg.favTxt;
+    document.getElementById("navProfIcon").innerText = cfg.prof; document.getElementById("navProfText").innerText = cfg.profTxt;
+}
+updateNavTheme();
+
+async function loadFavs() {
+  const favs = JSON.parse(localStorage.getItem("favRecipes")) || [];
+  const grid = document.getElementById("favGrid");
+  
+  if(favs.length === 0) {
+    grid.innerHTML = `<div style="text-align:center; color:var(--subtext); padding:40px;">No favorites yet.</div>`;
+    return;
+  }
+  
+  grid.innerHTML = "";
+  for(const id of favs) {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+    const data = await res.json();
+    const m = data.meals[0];
+    
+    grid.innerHTML += `
+      <div class="card" onclick="openR('${m.idMeal}')">
+        <img src="${m.strMealThumb}">
+        <div class="card-info">
+          <div style="font-weight:600; font-size:14px; margin-bottom:5px">${m.strMeal}</div>
+          <div style="font-size:12px; color:var(--subtext)">${m.strCategory}</div>
+        </div>
+        <button class="btn-remove" onclick="removeFav(event, '${m.idMeal}')">X</button>
+      </div>
+    `;
+  }
+}
+
+function openR(id){ localStorage.setItem("selectedRecipe",id); location.href="recipe2.html"; }
+
+function removeFav(e, id) {
+  e.stopPropagation();
+  let favs = JSON.parse(localStorage.getItem("favRecipes")) || [];
+  favs = favs.filter(f => f !== id);
+  localStorage.setItem("favRecipes", JSON.stringify(favs));
+  loadFavs();
+}
+
+loadFavs();
+</script>
+</body>
+</html>
